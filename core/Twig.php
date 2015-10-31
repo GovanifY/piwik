@@ -300,10 +300,6 @@ class Twig
     protected function addFilter_number()
     {
         $formatter = new Twig_SimpleFilter('number', function ($string, $minFractionDigits = 0, $maxFractionDigits = 0) {
-            // if a leading/trailing percent sign is found, format as percent number
-            if ($string != trim($string, '%')) {
-                return NumberFormatter::getInstance()->formatPercent($string, $minFractionDigits, $maxFractionDigits);
-            }
             return NumberFormatter::getInstance()->format($string, $minFractionDigits, $maxFractionDigits);
         });
         $this->twig->addFilter($formatter);
@@ -331,7 +327,7 @@ class Twig
             }
             $idSite = func_get_args();
             $idSite = $idSite[1];
-            $currencySymbol = Formatter::getCurrencySymbol($idSite);
+            $currencySymbol = Site::getCurrencySymbolFor($idSite);
             return NumberFormatter::getInstance()->formatCurrency($amount, $currencySymbol, GoalManager::REVENUE_PRECISION);
         });
         $this->twig->addFilter($moneyFilter);

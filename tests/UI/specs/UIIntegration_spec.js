@@ -41,6 +41,7 @@ describe("UIIntegrationTest", function () { // TODO: Rename to Piwik?
         testEnvironment.save();
     });
 
+
     // dashboard tests
     it("should load dashboard1 correctly", function (done) {
         expect.screenshot("dashboard1").to.be.captureSelector('.pageWrap,.expandDataTableFooterDrawer', function (page) {
@@ -82,7 +83,13 @@ describe("UIIntegrationTest", function () { // TODO: Rename to Piwik?
     it('should load visitors > overview page correctly', function (done) {
         expect.screenshot("visitors_overview").to.be.captureSelector('.pageWrap,.expandDataTableFooterDrawer', function (page) {
             // use columns query param to make sure columns works when supplied in URL fragment
-            page.load("?" + urlBase + "#" + generalParams + "&module=VisitsSummary&action=index&columns=nb_visits,nb_actions");
+            page.load("?" + urlBase + "#/?" + generalParams + "&module=VisitsSummary&action=index&columns=nb_visits,nb_actions");
+        }, done);
+    });
+
+    it('should reload the visitors > overview page when clicking on the visitors overview page element again', function (done) {
+        expect.screenshot("visitors_overview").to.be.captureSelector("visitors_overview_reloaded", '.pageWrap,.expandDataTableFooterDrawer', function (page) {
+            page.click('#VisitsSummary_index > a.item');
         }, done);
     });
 
@@ -146,6 +153,15 @@ describe("UIIntegrationTest", function () { // TODO: Rename to Piwik?
     it('should load the actions > pages page correctly', function (done) {
         expect.screenshot('actions_pages').to.be.captureSelector('.pageWrap,.expandDataTableFooterDrawer', function (page) {
             page.load("?" + urlBase + "#" + generalParams + "&module=Actions&action=menuGetPageUrls");
+        }, done);
+    });
+
+    // actions pages
+    it('should load the actions > pages help tooltip, including the "Report generated time"', function (done) {
+        expect.screenshot('actions_pages_tooltip_help').to.be.captureSelector('.pageWrap,.expandDataTableFooterDrawer', function (page) {
+            page.load("?" + urlBase + "#" + generalParams + "&module=Actions&action=menuGetPageUrls");
+            page.mouseMove('h2[piwik-enriched-headline]');
+            page.click(".helpIcon");
         }, done);
     });
 
@@ -264,6 +280,13 @@ describe("UIIntegrationTest", function () { // TODO: Rename to Piwik?
     it('should load the goals > single goal page correctly', function (done) {
         expect.screenshot('goals_individual_goal').to.be.captureSelector('.pageWrap,.expandDataTableFooterDrawer,.dataTable', function (page) {
             page.load("?" + urlBase + "#" + generalParams + "&module=Goals&action=goalReport&idGoal=1");
+        }, done);
+    });
+
+    // Events pages
+    it('should load the Events > index page correctly', function (done) {
+        expect.screenshot('events_overview').to.be.captureSelector('.pageWrap,.expandDataTableFooterDrawer,.dataTable', function (page) {
+            page.load("?" + urlBase + "#" + generalParams + "&module=Events&action=index");
         }, done);
     });
 
@@ -507,7 +530,7 @@ describe("UIIntegrationTest", function () { // TODO: Rename to Piwik?
     it('should fail correctly when db information in config is incorrect', function (done) {
         testEnvironment.configOverride = {
             database: {
-                host: '127.50.50.50',
+                host: config.phpServer.REMOTE_ADDR,
                 username: 'slkdfjsdlkfj',
                 password: 'slkdfjsldkfj',
                 dbname: 'abcdefg',
@@ -540,6 +563,13 @@ describe("UIIntegrationTest", function () { // TODO: Rename to Piwik?
             page.load("?" + generalParams + "&module=Widgetize&action=index");
             page.mouseMove('.widgetpreview-categorylist>li:contains(Visits Summary)');
             page.mouseMove('li[uniqueid=widgetVisitsSummarygetEvolutionGraphcolumnsArray]');
+            page.evaluate(function () {
+                $('.formEmbedCode').each(function () {
+                    var val = $(this).val();
+                    val = val.replace(/localhost\:[0-9]+/g, 'localhost');
+                    $(this).val(val);
+                });
+            });
         }, done);
     });
 

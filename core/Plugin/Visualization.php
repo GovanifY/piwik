@@ -359,7 +359,7 @@ class Visualization extends ViewDataTable
             $this->metadata = $this->dataTable->getAllTableMetadata();
 
             if (isset($this->metadata[DataTable::ARCHIVED_DATE_METADATA_NAME])) {
-                $this->config->report_last_updated_message = $this->makePrettyArchivedOnText();
+                $this->reportLastUpdatedMessage = $this->makePrettyArchivedOnText();
             }
         }
 
@@ -473,7 +473,8 @@ class Visualization extends ViewDataTable
 
         $prettyDate = $date->getLocalized(Date::DATE_FORMAT_SHORT);
 
-        return Piwik::translate('CoreHome_ReportGeneratedOn', $prettyDate);
+        $timezoneAppend = ' (UTC)';
+        return Piwik::translate('CoreHome_ReportGeneratedOn', $prettyDate) . $timezoneAppend;
     }
 
     /**
